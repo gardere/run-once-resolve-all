@@ -5,7 +5,7 @@ var deferredDictionary = {};
 function runOnceResolveAll(operationMethod, operationKey) {
   if (deferredDictionary[operationKey]) {
       log('pre-existing queue for ' + operationKey);
-      return deferredDictionary[operationKey].promise;
+      return deferredDictionary[operationKey];
   }
 
   deferredDictionary[operationKey] = new Promise((resolve, reject) => {
@@ -20,14 +20,13 @@ function runOnceResolveAll(operationMethod, operationKey) {
     promise
     .then(result => {
       log('resolving deferred for ' + operationKey);
+      delete deferredDictionary[operationKey];
       resolve(result);
     })
     .catch(result => {
       log('rejecting deferred for ' + operationKey);
-      reject(err);
-    })
-    .finally(() => {
       delete deferredDictionary[operationKey];
+      reject(err);
     });
   });
 
